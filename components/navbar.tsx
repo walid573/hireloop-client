@@ -16,11 +16,7 @@ import {
 import { Logo } from "@/components/logo"
 import { authClient, useSession } from "@/lib/auth-client"
 
-const navLinks = [
-  { label: "Browse Jobs", href: "/jobs" },
-  { label: "Company", href: "/company" },
-  { label: "Pricing", href: "/pricing" },
-]
+
 
 export function Navbar() {
   const pathname = usePathname()
@@ -28,6 +24,12 @@ export function Navbar() {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
   const {data :session } = useSession();
+  const navLinks = [
+  { label: "Browse Jobs", href: "/jobs" },
+  { label: "Company", href: "/company" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Dashboard", href: `/dashboard/${session?.user.role || 'seeker' }` },
+]
   const handleSignOut = async () => {
     await authClient.signOut({
   fetchOptions: {
