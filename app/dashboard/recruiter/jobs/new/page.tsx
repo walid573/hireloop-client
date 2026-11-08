@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { createJob } from "@/lib/actions/jobs"
 
 // TODO: call POST /api/jobs (or a server action) once the job API exists
 export interface NewJobData {
@@ -56,7 +57,7 @@ export default function NewJobPage() {
     // and we need it to disable the location field)
     const [remote, setRemote] = React.useState(false)
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         const data = Object.fromEntries(
             new FormData(e.currentTarget)
@@ -64,7 +65,9 @@ export default function NewJobPage() {
         const job = { ...data, remote }
 
         // TODO: replace with real submission
-        console.log(job)
+        const result = await createJob(job)
+        console.log('job data', result);
+        
     }
 
     return (
