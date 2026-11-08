@@ -19,20 +19,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { createJob } from "@/lib/actions/jobs"
 
 // TODO: call POST /api/jobs (or a server action) once the job API exists
-export interface NewJobData {
-    title: string
-    company: string
-    category: string
-    jobType: string
-    remote: boolean
-    location: string
-    deadline: string
-    salaryMin: string
-    salaryMax: string
-    salaryFrequency: string
-    responsibilities: string
-    requirements: string
-}
+import type { NewJobData } from "@/lib/job-types"
+
+export type { NewJobData }
 
 const JOB_CATEGORIES = [
     "Engineering & Tech",
