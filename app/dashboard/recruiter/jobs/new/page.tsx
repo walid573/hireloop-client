@@ -20,6 +20,8 @@ import { createJob } from "@/lib/actions/jobs"
 
 // TODO: call POST /api/jobs (or a server action) once the job API exists
 import type { NewJobData } from "@/lib/job-types"
+import { toast } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
 
 export type { NewJobData }
 
@@ -45,7 +47,7 @@ export default function NewJobPage() {
     // The only state: Remote Work toggle (Switch doesn't submit when unchecked,
     // and we need it to disable the location field)
     const [remote, setRemote] = React.useState(false)
-
+    const router = useRouter()
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         const data = Object.fromEntries(
@@ -55,7 +57,11 @@ export default function NewJobPage() {
 
         // TODO: replace with real submission
         const result = await createJob(job)
-        console.log('job data', result);
+        toast.add({
+            title: "Job created",
+            description: `The job "${result.title}" has been created successfully.`,
+        })
+        router.push(`/dashboard/recruiter/jobs`)
         
     }
 
