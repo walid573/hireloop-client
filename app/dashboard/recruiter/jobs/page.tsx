@@ -7,33 +7,13 @@ import { Eye, Pencil, Plus, Users } from "lucide-react"
 import { getJobs } from "@/lib/api/jobs"
 import { DeleteJobDialog } from "@/app/components/DeleteJobDialog"
 
+import type { JobFormData, JobRow, JobStatus } from "@/lib/job-types"
 
-// Table rows carry the same flat shape the "Post a New Job" form (JobFormData)
-// stores, plus the extra fields only the table needs.
+export type { JobFormData, JobRow }
 
-type JobType = "full-time" | "part-time" | "contract" | "internship"
-type JobStatus = "active" | "expired"
-export type JobFormData = {
-    title: string
-    companyName: string
-    category: string
-    jobType: JobType
-    isRemote: boolean
-    location: string
-    deadline: string
-    minSalary: string
-    maxSalary: string
-    salaryFrequency: string
-    responsibilities: string
-    requirements: string
-}
-export type JobRow = JobFormData & {
-    _id: string
-    applicants: number
-    status: JobStatus
-    /** Relativized post date, e.g. "Posted 4d ago". */
-    posted: string
-}
+// Table rows carry the same flat shape the "Post a New Job" form stores,
+// normalized (see lib/api/jobs), plus the extra fields only the table needs.
+// Types live in lib/job-types.ts — the single source of truth.
 
 /** €-formatted compensation: "75000","105000","per year" → "€75k – €105k / yr" (as in the Figma rows). Safe against missing values. */
 const salaryToken = (v: string) => {

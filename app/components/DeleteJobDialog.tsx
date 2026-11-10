@@ -4,7 +4,7 @@ import { Trash2Icon } from "lucide-react"
 import { useRouter } from 'next/navigation'
 
 import { Button } from "@/components/ui/button"
-import { JobRow } from "../dashboard/recruiter/jobs/page"
+import type { JobRow } from "@/lib/job-types"
 import { deleteJob } from "@/lib/actions/jobs"
 import { toast } from "@/components/ui/toast"
 import {

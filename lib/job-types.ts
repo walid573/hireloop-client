@@ -1,6 +1,12 @@
-type JobStatus = "Active" | "Expired" | "Closed"
+// ── Single source of truth for job types ───────────────────────────
+//
+// WRITE shape (NewJobData) — the flat payload the "Post a New Job" form
+// (app/dashboard/recruiter/jobs/new) collects and createJob() stores.
+//
+// READ shape (JobFormData/JobRow) — the normalized shape the database
+// API returns and the dashboards render (see lib/api/jobs normalizeJob;
+// it maps write keys → read keys).
 
-// What the "Post a Job" form collects (see dashboard/recruiter/jobs/new)
 export interface NewJobData {
   title: string
   company: string
@@ -16,11 +22,29 @@ export interface NewJobData {
   requirements: string
 }
 
-// A row on the "Manage Job Posts" table = collected data + recruiter-side tracking fields
-export interface JobRow extends NewJobData {
-  _id: number
-  status: JobStatus
+export type JobType = "full-time" | "part-time" | "contract" | "internship"
+
+export type JobStatus = "active" | "expired"
+
+export type JobFormData = {
+  title: string
+  companyName: string
+  category: string
+  jobType: JobType
+  isRemote: boolean
+  location: string
+  deadline: string
+  minSalary: string
+  maxSalary: string
+  salaryFrequency: string
+  responsibilities: string
+  requirements: string
+}
+
+export type JobRow = JobFormData & {
+  _id: string
   applicants: number
-  postedAt: string
-  postedRelative: string
+  status: JobStatus
+  /** Relativized post date, e.g. "Posted 4d ago". */
+  posted: string
 }

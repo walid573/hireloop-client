@@ -1,4 +1,4 @@
-import { NewJobData } from "@/app/dashboard/recruiter/jobs/new/page";
+import type { NewJobData } from "@/lib/job-types";
 
 const BaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
