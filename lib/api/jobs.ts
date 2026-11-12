@@ -63,8 +63,13 @@ function normalizeJob(raw: ApiJob): JobRow {
 }
 
 export const getJobs = async (query = ''): Promise<JobRow[]> => {
-    const res = await fetch(`${BaseUrl}/jobs?${query}`);
+    const res = await fetch(`${BaseUrl}/jobs${query ? `?${query}` : ""}`);
     const data: unknown = await res.json();
     if (!Array.isArray(data)) return [];
     return data.map((item) => normalizeJob(item as ApiJob));
+}
+
+export const getJobById = async (id: string): Promise<JobRow> => {
+    const res = await fetch(`${BaseUrl}/jobs/${id}`);
+    return res.json()
 }

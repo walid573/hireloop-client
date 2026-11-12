@@ -1,18 +1,22 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { AuthForm, type AuthFormData } from "@/components/auth-form"
 import { authClient } from "@/lib/auth-client"
 
 export default function SignInPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get("redirect") || "/"
+
+
 
   const handleSignIn = async (data: AuthFormData) => {
     const { error } = await authClient.signIn.email({
       email: data.email, // required, The email address of the user.
       password: data.password, // required, The password of the user.
-      callbackURL: "/", // An optional URL to redirect to after the user signs in.
+      callbackURL: redirectTo, // An optional URL to redirect to after the user signs in.
     })
 
     if (error) {
