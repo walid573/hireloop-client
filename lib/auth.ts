@@ -5,6 +5,9 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 const client = new MongoClient(process.env.MONGODB_URL as string);
 const db = client.db('hireloopdb');
 
+// Used by server actions for direct premium/user lookups
+export { db };
+
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
     emailAndPassword: { 

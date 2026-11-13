@@ -10,6 +10,8 @@
 export interface NewJobData {
   title: string
   company: string
+  companyId?: string
+  recruiterId: string
   category: string
   jobType: string
   remote: boolean
@@ -43,6 +45,8 @@ export type JobFormData = {
 
 export type JobRow = JobFormData & {
   _id: string
+  /** Who posted the job (the recruiter's user id) — used for ownership checks. */
+  recruiterId?: string
   applicants: number
   status: JobStatus
   /** Relativized post date, e.g. "Posted 4d ago". */

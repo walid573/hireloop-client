@@ -33,6 +33,7 @@ export default function SignInPage() {
       name: data.name,
       email: data.email,
       password: data.password,
+      role: data.role, // user additionalField — requires input: true in lib/auth.ts
       callbackURL: "/",
     })
 

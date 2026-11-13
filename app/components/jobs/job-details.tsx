@@ -13,6 +13,8 @@ import { cn } from "cn"
 import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { appyToJob, getApplicationsCount } from "@/lib/actions/applications"
+import { toast } from "@/components/ui/toast"
+import { getUserPremiumById } from "@/lib/api/users"
 
 /** Card style shared by every block of the Figma Job Details screen. */
 const card = "rounded-xl border border-white/[0.07] bg-[#141418]"
@@ -36,7 +38,11 @@ export function JobDetails({ job }: { job: JobRow }) {
         else if(user.role === 'seeker'){
 
             const countResult = await getApplicationsCount(`applicantId=${user.id}`);
-            if(countResult.count >= 10) {
+
+            const premiumResult = await getUserPremiumById(user.id)
+
+            // Free users can apply to at most 2 jobs; premium is unlimited
+            if(!premiumResult.premium && countResult.count >= 2) {
                 router.push(`/payment`)
                 return
             }
@@ -54,7 +60,10 @@ export function JobDetails({ job }: { job: JobRow }) {
             if(result.insertedId){
                 console.log('Application done');
                 router.push(`/browse-jobs`)
-                
+                toast.add({
+                    title:'Application Submitted',
+                    description:'Your application have been submitted successfully'
+                })
             }
             }
 

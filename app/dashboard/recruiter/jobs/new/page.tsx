@@ -22,6 +22,7 @@ import { createJob } from "@/lib/actions/jobs"
 import type { NewJobData } from "@/lib/job-types"
 import { toast } from "@/components/ui/toast"
 import { useRouter } from "next/navigation"
+import { useSession } from "@/lib/auth-client"
 
 export type { NewJobData }
 
@@ -46,23 +47,58 @@ const FIELD_BG =
 export default function NewJobPage() {
     // The only state: Remote Work toggle (Switch doesn't submit when unchecked,
     // and we need it to disable the location field)
+    const { data:session} = useSession();
+    
     const [remote, setRemote] = React.useState(false)
     const router = useRouter()
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
+        const recruiterId = session?.user?.id
+         if (!recruiterId) {
+        toast.add({
+            title: "Not signed in",
+            description: "Please sign in to post a job.",
+            type: "error",
+            
+        })
+        return
+    }
         const data = Object.fromEntries(
             new FormData(e.currentTarget)
         ) as unknown as NewJobData
-        const job = { ...data, remote }
+        const job = { ...data, remote, recruiterId }
 
         // TODO: replace with real submission
-        const result = await createJob(job)
+        const result = await createJob(job) as {
+            error?: string
+            message?: string
+            title?: string
+        }
+
+        if (result.error) {
+            if (result.error === "premium-required") {
+                toast.add({
+                    title: "Premium required",
+                    description: result.message,
+                    type: "error",
+                })
+                router.push("/payment")
+            } else {
+                toast.add({
+                    title: "Couldn't create job",
+                    description: result.message ?? "Please try again.",
+                    type: "error",
+                })
+            }
+            return
+        }
+
         toast.add({
             title: "Job created",
             description: `The job "${result.title}" has been created successfully.`,
         })
         router.push(`/dashboard/recruiter/jobs`)
-        
+
     }
 
     return (

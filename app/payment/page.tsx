@@ -13,50 +13,51 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { PREMIUM_PRODUCT as PRODUCT } from "@/lib/billing"
 
-// ── Product configuration ────────────────────────────────────────────
-// TODO: replace with the real product / pricing once billing exists
-const PRODUCT = {
-    name: "Featured Job Posting",
-    description:
-        "One featured listing with 30-day visibility and priority placement in search results.",
-    price: 49,
-    currency: "€",
-}
+const total = PRODUCT.price
 
-const VAT_RATE = 0.2
-const vat = PRODUCT.price * VAT_RATE
-const total = PRODUCT.price + vat
-
-const formatAmount = (amount: number) => `${PRODUCT.currency}${amount.toFixed(2)}`
+const formatAmount = (amount: number) => `${PRODUCT.currencySymbol}${amount.toFixed(2)}`
 
 const FEATURES = [
+    "Unlimited access to all premium features",
     "Priority placement in browse & search results",
-    "Highlighted “Featured” badge on your listing",
-    "30 days of visibility",
-    "Application tracking via your recruiter dashboard",
+    "Advanced filters and full applicant insights",
+    "Pay once — yours forever, no recurring charges",
 ]
 
-export default function PaymentPage() {
+export default function PaymentPage({}) {
     const [redirecting, setRedirecting] = React.useState(false)
+    const [error, setError] = React.useState<string | null>(null)
+    // Set when Stripe redirects back with ?canceled=1
+    const [canceled, setCanceled] = React.useState(false)
+
+    React.useEffect(() => {
+        if (new URLSearchParams(window.location.search).get("canceled")) {
+            setCanceled(true)
+        }
+    }, [])
 
     async function handlePay() {
         setRedirecting(true)
+        setError(null)
         try {
-            // TODO: Stripe Checkout — replace this block once the API route exists:
-            //
-            //   const res = await fetch("/api/checkout", {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({ price: PRODUCT.price, currency: "eur" }),
-            //   })
-            //   if (!res.ok) throw new Error("Failed to start checkout")
-            //   const { url } = await res.json()
-            //   window.location.href = url // redirect to Stripe Checkout page
-            //
-            await new Promise((resolve) => setTimeout(resolve, 1200))
-            console.warn("Stripe Checkout is not wired up yet.")
-        } finally {
+            // Create a Stripe Checkout Session and redirect to its hosted page
+            const res = await fetch("/api/checkout", { method: "POST" })
+            const data = (await res.json()) as { url?: string; error?: string }
+
+            if (!res.ok || !data.url) {
+                throw new Error(data.error ?? "Failed to start checkout.")
+            }
+
+            // Hand off to Stripe; we stay "redirecting" while navigating away
+            window.location.href = data.url
+        } catch (err) {
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Something went wrong. Please try again."
+            )
             setRedirecting(false)
         }
     }
@@ -72,11 +73,25 @@ export default function PaymentPage() {
                     <span className="mx-1.5">›</span>
                     <span className="text-primary">Checkout</span>
                 </p>
-                <h1 className="mt-1 text-3xl font-semibold">Complete your payment</h1>
+                <h1 className="mt-1 text-3xl font-semibold">
+                    Unlock Premium — one-time payment
+                </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                    Review your order below — you&apos;ll finish payment securely on Stripe.
+                    Pay once to access all premium features. You&apos;ll finish payment
+                    securely on Stripe.
                 </p>
             </header>
+
+            {/* ── Stripe cancel notice ───────────────────────────────── */}
+            {canceled && (
+                <div
+                    role="status"
+                    className="mb-6 flex items-center gap-3 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground"
+                >
+                    <Lock className="size-4 shrink-0" />
+                    <p>Checkout was canceled — you were not charged.</p>
+                </div>
+            )}
 
             <div className="grid gap-6 lg:grid-cols-5">
                 {/* ── 1 · Order summary ───────────────────────────────────── */}
@@ -96,7 +111,12 @@ export default function PaymentPage() {
                                 <CreditCard className="size-5 text-primary" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium">{PRODUCT.name}</p>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-sm font-medium">{PRODUCT.name}</p>
+                                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                        One-time payment
+                                    </span>
+                                </div>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
                                     {PRODUCT.description}
                                 </p>
@@ -119,18 +139,14 @@ export default function PaymentPage() {
                     {/* Price breakdown */}
                     <dl className="mt-6 space-y-2.5 text-sm">
                         <div className="flex justify-between">
-                            <dt className="text-muted-foreground">Subtotal</dt>
+                            <dt className="text-muted-foreground">One-time payment</dt>
                             <dd>{formatAmount(PRODUCT.price)}</dd>
-                        </div>
-                        <div className="flex justify-between">
-                            <dt className="text-muted-foreground">VAT ({VAT_RATE * 100}%)</dt>
-                            <dd>{formatAmount(vat)}</dd>
                         </div>
 
                         <Separator className="my-3" />
 
                         <div className="flex justify-between text-base font-semibold">
-                            <dt>Total due</dt>
+                            <dt>Pay once, total</dt>
                             <dd>{formatAmount(total)}</dd>
                         </div>
                     </dl>
@@ -152,10 +168,10 @@ export default function PaymentPage() {
                             <ShieldCheck className="size-5 shrink-0 text-muted-foreground" />
                             <p className="text-xs text-muted-foreground">
                                 <span className="font-medium text-foreground">
-                                    Pay securely with Stripe.
+                                    One-time payment of {formatAmount(total)}.
                                 </span>{" "}
-                                Card details are handled entirely by Stripe — they never touch
-                                our servers.
+                                No subscription — your premium access never expires. Payment
+                                is handled securely by Stripe.
                             </p>
                         </div>
                     </div>
@@ -164,7 +180,7 @@ export default function PaymentPage() {
                         <p className="text-xs text-muted-foreground">
                             Clicking the button below will take you to Stripe&apos;s secure
                             checkout page to enter your card details. You&apos;ll be brought
-                            back here once payment is complete.
+                            back here to start using your premium features right away.
                         </p>
                     </div>
 
@@ -181,11 +197,17 @@ export default function PaymentPage() {
                             </>
                         ) : (
                             <>
-                                Pay {formatAmount(total)}
+                                Pay once {formatAmount(total)}
                                 <ArrowRight />
                             </>
                         )}
                     </Button>
+
+                    {error && (
+                        <p role="alert" className="mt-3 text-center text-xs text-destructive">
+                            {error}
+                        </p>
+                    )}
 
                     <p className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
                         <Lock className="size-3" />

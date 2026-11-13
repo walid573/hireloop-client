@@ -2,33 +2,16 @@
 import React from "react"
 import { FileDownIcon } from "lucide-react"
 
+import { ApplicationStatusChip } from "@/app/components/applications/application-status-chip"
 import { JobPagination } from "@/app/components/jobs/job-pagination"
 import { formatJobType } from "@/lib/job-format"
-import type { ApplicationRow, ApplicationStatus } from "@/lib/application-types"
+import type { ApplicationRow } from "@/lib/application-types"
 import { cn } from "cn"
 import { getApplications } from "@/lib/actions/applications"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 
 /** Dummy placeholder — real data is loaded from the backend later. */
-
-
-/** Status chip styles from the Figma "Seeker / My Applications" screen. */
-const statusStyles: Record<ApplicationStatus, string> = {
-    applied: "bg-[#a1a4aa]/14 text-[#a0a0ab] border-white/10",
-    review: "bg-[#f59e0b]/14 text-[#f59e0b] border-[#f59e0b]/30",
-    shortlisted: "bg-[#60a5fa]/14 text-[#60a5fa] border-[#60a5fa]/30",
-    rejected: "bg-[#ef4444]/14 text-[#ef4444] border-[#ef4444]/30",
-    offered: "bg-[#22c55e]/14 text-[#22c55e] border-[#22c55e]/30",
-}
-
-const statusLabels: Record<ApplicationStatus, string> = {
-    applied: "Applied",
-    review: "Review",
-    shortlisted: "Shortlisted",
-    rejected: "Rejected",
-    offered: "Offered",
-}
 
 const card = "rounded-xl border border-white/[0.07] bg-[#141418]"
 const headCell = "px-4 py-3 text-left text-xs text-[#6e6e78] font-medium"
@@ -132,14 +115,7 @@ export default async function MyApplicationsPage() {
                                         {application.appliedAt}
                                     </td>
                                     <td className="p-4">
-                                        <span
-                                            className={cn(
-                                                "inline-flex h-[22px] items-center rounded border px-3 text-xs font-medium",
-                                                statusStyles[application.status]
-                                            )}
-                                        >
-                                            {statusLabels[application.status]}
-                                        </span>
+                                        <ApplicationStatusChip status={application.status} />
                                     </td>
                                     <td className="p-4 pr-6 text-right">
                                         <button

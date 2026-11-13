@@ -17,6 +17,7 @@ interface ApiJob {
     title?: string
     companyName?: string
     company?: string
+    recruiterId?: string
     category?: string
     jobType?: string
     isRemote?: boolean
@@ -44,6 +45,7 @@ function normalizeJob(raw: ApiJob): JobRow {
     const jobType = String(raw?.jobType ?? "full-time").toLowerCase() as JobRow["jobType"];
     return {
         _id: String(raw?._id ?? raw?.id ?? raw?.title),
+        recruiterId: raw?.recruiterId ?? "",
         title: raw?.title ?? "Untitled job",
         companyName: raw?.companyName ?? raw?.company ?? "—",
         category: raw?.category ?? "—",
@@ -69,7 +71,14 @@ export const getJobs = async (query = ''): Promise<JobRow[]> => {
     return data.map((item) => normalizeJob(item as ApiJob));
 }
 
-export const getJobById = async (id: string): Promise<JobRow> => {
-    const res = await fetch(`${BaseUrl}/jobs/${id}`);
-    return res.json()
+/** A single job, normalized like getJobs. Returns null when the job does
+ * not exist (or the backend is down) so pages can render a 404. */
+export const getJobById = async (id: string): Promise<JobRow | null> => {
+    try {
+        const res = await fetch(`${BaseUrl}/jobs/${id}`);
+        if (!res.ok) return null
+        return normalizeJob(await res.json());
+    } catch {
+        return null
+    }
 }
