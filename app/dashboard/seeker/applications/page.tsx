@@ -7,7 +7,7 @@ import { JobPagination } from "@/app/components/jobs/job-pagination"
 import { formatJobType } from "@/lib/job-format"
 import type { ApplicationRow } from "@/lib/application-types"
 import { cn } from "cn"
-import { getApplications } from "@/lib/actions/applications"
+import { getApplications } from "@/lib/api/applications"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 

@@ -1,10 +1,18 @@
 import type { ApplicationStatus } from "@/lib/application-types"
 import { cn } from "@/lib/utils"
 
+/** All lifecycle statuses, in display order. */
+export const APPLICATION_STATUSES: ApplicationStatus[] = [
+    "applied",
+    "review",
+    "shortlisted",
+    "rejected",
+    "offered",
+]
+
 /** Chip styles per status — from the Figma "Seeker / My Applications" screen.
- * Shared by the seeker's "My Applications" and the recruiter's per-job
- * applications table. */
-const statusStyles: Record<ApplicationStatus, string> = {
+ * Shared by the status chip and the recruiter's status-update select. */
+export const statusStyles: Record<ApplicationStatus, string> = {
     applied: "bg-[#a1a4aa]/14 text-[#a0a0ab] border-white/10",
     review: "bg-[#f59e0b]/14 text-[#f59e0b] border-[#f59e0b]/30",
     shortlisted: "bg-[#60a5fa]/14 text-[#60a5fa] border-[#60a5fa]/30",
@@ -12,7 +20,7 @@ const statusStyles: Record<ApplicationStatus, string> = {
     offered: "bg-[#22c55e]/14 text-[#22c55e] border-[#22c55e]/30",
 }
 
-const statusLabels: Record<ApplicationStatus, string> = {
+export const statusLabels: Record<ApplicationStatus, string> = {
     applied: "Applied",
     review: "Review",
     shortlisted: "Shortlisted",

@@ -12,7 +12,7 @@ import type { JobRow } from "@/lib/job-types"
 import { cn } from "cn"
 import { useSession } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
-import { appyToJob, getApplicationsCount } from "@/lib/actions/applications"
+import { appyToJob, getApplicationsCount } from "@/lib/api/applications"
 import { toast } from "@/components/ui/toast"
 import { getUserPremiumById } from "@/lib/api/users"
 

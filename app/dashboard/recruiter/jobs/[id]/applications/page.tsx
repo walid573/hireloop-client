@@ -2,8 +2,8 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Users } from "lucide-react"
 
-import { ApplicationStatusChip } from "@/app/components/applications/application-status-chip"
-import { getApplications } from "@/lib/actions/applications"
+import { ApplicationStatusSelect } from "@/app/components/applications/application-status-select"
+import { getApplications } from "@/lib/api/applications"
 import { getJobById } from "@/lib/api/jobs"
 import { getSession } from "@/lib/core/server"
 import type { ApplicationRow, ApplicationStatus } from "@/lib/application-types"
@@ -143,9 +143,12 @@ export default async function JobApplicationsPage({ params }: { params: Promise<
                                         {formatAppliedDate(application.appliedAt)}
                                     </td>
 
-                                    {/* Status — updates come later (recruiter actions) */}
+                                    {/* Status — select the next stage; DB write is wired later */}
                                     <td className={cn(cellClass, "px-5")}>
-                                        <ApplicationStatusChip status={application.status} />
+                                        <ApplicationStatusSelect
+                                            applicationId={application._id}
+                                            status={application.status}
+                                        />
                                     </td>
                                 </tr>
                             ))}

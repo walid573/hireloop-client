@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react"
-import { inferAdditionalFields } from "better-auth/client/plugins"
+import { adminClient, inferAdditionalFields } from "better-auth/client/plugins"
 // Type-only import: gives the client knowledge of user additionalFields
 // (e.g. `role`) without bundling any server code
 import type { auth } from "@/lib/auth"
@@ -10,7 +10,7 @@ export const authClient = createAuthClient({
     plugins: [
         // Infer server-side user additionalFields so `role` is typed on
         // signUp.email input / session user output
-        inferAdditionalFields<typeof auth>()
+        inferAdditionalFields<typeof auth>(), adminClient()
     ]
 })
 
