@@ -10,7 +10,9 @@ export const authClient = createAuthClient({
     plugins: [
         // Infer server-side user additionalFields so `role` is typed on
         // signUp.email input / session user output
-        inferAdditionalFields<typeof auth>(), adminClient()
+        inferAdditionalFields<typeof auth>(),
+        // Types `role` on the session user + enables admin.* client calls
+        adminClient()
     ]
 })
 

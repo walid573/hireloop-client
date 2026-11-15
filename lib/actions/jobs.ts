@@ -5,6 +5,7 @@ import { ObjectId } from "mongodb";
 
 import { auth, db } from "@/lib/auth";
 import type { NewJobData } from "@/lib/job-types";
+import { protectedMutation } from "../core/server";
 
 const BaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -45,14 +46,8 @@ const createJob = async (data: NewJobData) => {
     }
 
     // ── 3. Forward to the backend with the shared internal key ──────────
-    const res = await fetch(`${BaseUrl}/jobs`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "x-internal-key": INTERNAL_KEY,
-        },
-        body: JSON.stringify(data),
-    });
+    const api= `${BaseUrl}/jobs`
+   const res = await protectedMutation(api,"POST",data)
 
     const raw = await res.text();
     if (!res.ok) {

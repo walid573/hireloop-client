@@ -7,9 +7,10 @@
 // update is wired up later.
 
 import { PageContainer, PageHeader } from "@/components/dashboard/page-shell"
-import { getUsers } from "@/lib/api/users"
+
 import { ROLE_META, type UserRow, type UserRole } from "@/lib/types/users"
 import { UsersTable } from "./_components/users-table"
+import { getUsers } from "@/lib/actions/user"
 
 /** better-auth's role is a plain string — coerce to the known union. */
 const toUserRole = (role: string | undefined): UserRole =>
@@ -21,17 +22,16 @@ export default async function AdminUsersPage() {
     let rows: UserRow[] = []
     let loadError = false
     try {
-        // listUsers returns the users array directly (admin plugin).
-        const result = await getUsers()
-        const users = Array.isArray(result) ? result : result.users
+        // getUsers returns the accounts normalized (admin session required).
+        const users = await getUsers()
 
-        rows = (users ?? []).map((user) => ({
+        rows = users.map((user) => ({
             id: user.id,
             name: user.name,
             email: user.email,
             role: toUserRole(user.role),
-            createdAt: new Date(user.createdAt).toISOString(),
-            banned: Boolean(user.banned),
+            createdAt: user.createdAt,
+            banned: user.banned,
         }))
     } catch {
         loadError = true

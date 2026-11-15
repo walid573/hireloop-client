@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 
 import { AuthForm, type AuthFormData } from "@/components/auth-form"
 import { authClient } from "@/lib/auth-client"
+import { setInitialRole } from "@/lib/actions/user"
 
 export default function SignInPage() {
   const router = useRouter()
@@ -29,17 +30,21 @@ export default function SignInPage() {
   }
 
   const handleSignUp = async (data: AuthFormData) => {
+    // role can't travel through signUp.email — the admin plugin marks it
+    // input:false ("role is not allowed to be set"). It's applied right
+    // after, via the setInitialRole server action.
     const { error } = await authClient.signUp.email({
       name: data.name,
       email: data.email,
       password: data.password,
-      role: data.role, // user additionalField — requires input: true in lib/auth.ts
       callbackURL: "/",
     })
 
     if (error) {
       throw new Error(error.message ?? "Failed to create account. Please try again.")
     }
+
+    await setInitialRole(data.role)
     router.push("/signin")
   }
 
