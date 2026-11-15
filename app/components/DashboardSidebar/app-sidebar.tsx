@@ -6,6 +6,7 @@ import {
   ChartColumn,
   ClipboardList,
   FilePlus2,
+  Home,
   LayoutDashboard,
   MessagesSquare,
   Settings,
@@ -25,6 +26,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useSession } from "@/lib/auth-client"
+import { ROLE_META } from "@/lib/types/users"
 import Link from "next/link"
 
 type Role = "seeker" | "recruiter" | "admin"
@@ -67,7 +69,37 @@ export function AppSidebar() {
   const items = menuItemByRole[role] ?? menuItemByRole.seeker
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>
+        {/* Back to the public site */}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton render={<Link href="/" />}>
+              <Home />
+              <span>Home</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
+        {/* Signed-in user — name + role */}
+        {!isPending && session?.user && (
+          <div className="mx-2 flex items-center gap-2.5 rounded-lg px-2 py-1.5">
+            <span
+              aria-hidden
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary"
+            >
+              {session.user.name?.charAt(0).toUpperCase() || "?"}
+            </span>
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate text-sm font-medium text-sidebar-foreground">
+                {session.user.name}
+              </span>
+              <span className="truncate text-xs text-sidebar-foreground/60">
+                {ROLE_META[role].label}
+              </span>
+            </div>
+          </div>
+        )}
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup />
         <SidebarGroup />

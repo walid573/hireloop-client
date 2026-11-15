@@ -1,7 +1,7 @@
 "use client"
 
-import { Briefcase, Building2, Eye, EyeOff, Mail, ShieldCheck } from "lucide-react"
-import { useState, type FormEvent } from "react"
+import { Briefcase, Building2, Eye, EyeOff, Mail } from "lucide-react"
+import { useState, type ChangeEvent, type FormEvent } from "react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -19,6 +19,8 @@ export type AuthFormData = {
   password: string
   /** Who the user is on thtform — sent to Better Auth as a user field */
   role: AccountRole
+  /** Picked profile image — the upload itself is implemented separately. */
+  image: File | null
 }
 
 type AuthFormProps = {
@@ -38,12 +40,12 @@ const initialFormData: AuthFormData = {
   email: "",
   password: "",
   role: "seeker",
+  image: null,
 }
 
 const roleOptions: { value: AccountRole; label: string; icon: typeof Briefcase; hint: string }[] = [
   { value: "seeker", label: "Seeker", icon: Briefcase, hint: "I'm looking for a job" },
   { value: "recruiter", label: "Recruiter", icon: Building2, hint: "I'm hiring talent" },
-  { value: "admin", label: "Admin", icon: ShieldCheck, hint: "Platform administrator" },
 ]
 
 export function AuthForm({ initialMode, onSignIn, onSignUp }: AuthFormProps) {
@@ -63,6 +65,13 @@ export function AuthForm({ initialMode, onSignIn, onSignUp }: AuthFormProps) {
 
   const handleChange = (field: keyof AuthFormData) => (value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  /** Image field's onChange — captures the picked file only; the actual
+   * upload is implemented separately (no network call happens here). */
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null
+    setFormData((prev) => ({ ...prev, image: file }))
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -193,7 +202,7 @@ export function AuthForm({ initialMode, onSignIn, onSignUp }: AuthFormProps) {
                 <div
                   role="radiogroup"
                   aria-label="Account type"
-                  className="grid gap-2 sm:grid-cols-3"
+                  className="grid gap-2 sm:grid-cols-2"
                 >
                   {roleOptions.map(({ value, label, icon: Icon, hint }) => (
                     <button
@@ -223,6 +232,23 @@ export function AuthForm({ initialMode, onSignIn, onSignUp }: AuthFormProps) {
                   ))}
                 </div>
               </fieldset>
+            )}
+
+            {isSignUp && (
+              <div className="grid gap-2">
+                <Label htmlFor="image">Profile picture</Label>
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                {formData.image && (
+                  <p className="text-xs text-muted-foreground">
+                    {formData.image.name}
+                  </p>
+                )}
+              </div>
             )}
 
             <div className="grid gap-2">

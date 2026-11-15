@@ -77,6 +77,11 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             {session?.user ? 
             <>
+            <img
+              src={session.user.image || "/avatar-placeholder.svg"}
+              alt={session.user.name ? `${session.user.name}'s avatar` : "User avatar"}
+              className="size-8 rounded-full border border-border object-cover"
+            />
             <span>Welcome, {session.user.name}!</span>
             <Button onClick={handleSignOut}>Sign Out</Button>
             </>
